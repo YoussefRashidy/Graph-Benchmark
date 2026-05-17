@@ -2,14 +2,15 @@ package io.github.youssefrashidy.graph;
 
 import io.github.youssefrashidy.graph.augumentingDS.DisjointSet;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.stack.primitive.MutableIntStack;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+import org.eclipse.collections.impl.stack.mutable.primitive.IntArrayStack;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Graph<VD, ED> {
     private int vertexCounter = 0;
@@ -22,9 +23,13 @@ public class Graph<VD, ED> {
     MutableList<Edge<ED>> edgeList = FastList.newList();
 
     Vertex<VD> addVertex(VD data) {
-        var vertex = new Vertex<VD>(vertexCounter++, data);
+        var vertex = new Vertex<>(vertexCounter++, data);
         verticesMap.put(vertex.id, vertex);
         return vertex;
+    }
+
+    Vertex<VD> getVertex(int id) {
+        return verticesMap.get(id);
     }
 
     // adds edge between existing nodes
@@ -47,13 +52,13 @@ public class Graph<VD, ED> {
         isDirected = true;
     }
 
-    private static record QueueEntry<ED>(int vertexId, int key, Edge<ED> parentEdge) {
+    private record QueueEntry<ED>(int vertexId, int key, Edge<ED> parentEdge) {
 
     }
 
     List<Edge<ED>> primMST() {
         if (isDirected)
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Prim's MST is not supported for directed graphs.");
         List<Edge<ED>> mst = FastList.newList();
 
         IntBooleanHashMap inMST = new IntBooleanHashMap();
@@ -71,7 +76,7 @@ public class Graph<VD, ED> {
         inMST.put(source, true);
         key.put(source, 0);
 
-        priorityQueue.add(new QueueEntry<ED>(source, 0, null));
+        priorityQueue.add(new QueueEntry<>(source, 0, null));
 
         while (!priorityQueue.isEmpty()) {
             QueueEntry<ED> minVertex = priorityQueue.poll();
@@ -89,7 +94,7 @@ public class Graph<VD, ED> {
                     return;
                 if (key.get(destination) <= weight)
                     return;
-                priorityQueue.offer(new QueueEntry<ED>(destination, weight, edge));
+                priorityQueue.offer(new QueueEntry<>(destination, weight, edge));
             });
 
             if (minVertex.parentEdge() != null)
@@ -100,7 +105,7 @@ public class Graph<VD, ED> {
 
     List<Edge<ED>> kruskalMST() {
         if (isDirected)
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Kruskal's MST is not supported for directed graphs.");
 
         List<Edge<ED>> mst = FastList.newList();
         DisjointSet disjointSet = new DisjointSet();
@@ -120,5 +125,112 @@ public class Graph<VD, ED> {
         });
 
         return mst;
+    }
+
+    IntIntHashMap dijkstra(Vertex<VD> source) {
+
+        IntBooleanHashMap foundShortestPath = new IntBooleanHashMap();
+        IntIntHashMap distanceMap = new IntIntHashMap();
+        PriorityQueue<QueueEntry<ED>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(QueueEntry::key));
+
+        verticesMap.keysView().forEach(key -> {
+            foundShortestPath.put(key, false);
+            distanceMap.put(key, Integer.MAX_VALUE);
+        });
+
+        int id = source.id;
+        distanceMap.put(id, 0);
+        foundShortestPath.put(id, false);
+        priorityQueue.offer(new QueueEntry<>(id, 0, null));
+
+        while (!priorityQueue.isEmpty()) {
+            QueueEntry<ED> min = priorityQueue.poll();
+            int u = min.vertexId();
+            if (foundShortestPath.get(u))
+                continue;
+            foundShortestPath.put(u, true);
+            adjacencyList.get(u).forEach(edge -> {
+                int v = edge.v;
+                int weight = edge.weight;
+                if (distanceMap.get(v) <= weight + distanceMap.get(u) || foundShortestPath.get(v))
+                    return;
+                // relaxation
+                int newWeight = weight + distanceMap.get(u);
+                distanceMap.put(v, newWeight);
+                priorityQueue.offer(new QueueEntry<>(v, newWeight, edge));
+            });
+        }
+        return distanceMap;
+    }
+
+    IntIntHashMap dagShortestPath(Vertex<VD> source) {
+        IntIntHashMap distances = new IntIntHashMap();
+        MutableIntStack stack = topologicalSort();
+
+        adjacencyList.keysView().forEach(vertex -> distances.put(vertex, Integer.MAX_VALUE));
+        distances.put(source.id, 0);
+
+        while (!stack.isEmpty()) {
+            int u = stack.pop();
+            if (distances.get(u) == Integer.MAX_VALUE)
+                continue;
+
+            adjacencyList.get(u).forEach(edge -> {
+                int v = edge.v;
+                int weight = edge.weight;
+                // oops, overflow now no overflow
+                if (distances.get(v) > weight + distances.get(u))
+                    distances.put(v, weight + distances.get(u));
+            });
+        }
+        return distances;
+    }
+
+    MutableIntStack topologicalSort() {
+        MutableIntStack stack = new IntArrayStack();
+        IntHashSet visited = new IntHashSet();
+        IntHashSet onStack = new IntHashSet();
+        adjacencyList.keysView().forEach(vertex -> {
+            if (visited.contains(vertex))
+                return;
+            dfs(vertex, stack, visited, onStack);
+        });
+        return stack;
+    }
+
+    private void dfs(int vertex, MutableIntStack stack, IntHashSet visited, IntHashSet onStack) {
+        visited.add(vertex);
+        onStack.add(vertex);
+        adjacencyList.get(vertex).forEach(edge -> {
+            int v = edge.v;
+            if (visited.contains(v))
+                return;
+            if (onStack.contains(v))
+                throw new CycleDetectedException();
+            dfs(v, stack, visited, onStack);
+        });
+        onStack.remove(vertex);
+        stack.push(vertex);
+    }
+
+    private static class CycleDetectedException extends RuntimeException {
+        public CycleDetectedException() {
+        }
+
+        public CycleDetectedException(String message) {
+            super(message);
+        }
+
+        public CycleDetectedException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public CycleDetectedException(Throwable cause) {
+            super(cause);
+        }
+
+        public CycleDetectedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
     }
 }

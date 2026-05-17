@@ -7,6 +7,9 @@ public class DisjointSet {
     IntIntHashMap rank = new IntIntHashMap();
 
     public void makeSet(int vertex) {
+        // Should overwrite ?
+        // Should ignore ?
+        // throw exception ?
         if (parent.containsKey(vertex))
             return;
         parent.put(vertex, vertex);
