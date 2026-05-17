@@ -1,5 +1,6 @@
 package io.github.youssefrashidy.graph;
 
+import io.github.youssefrashidy.graph.augumentingDS.DisjointSet;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
@@ -57,6 +58,7 @@ public class Graph<VD, ED> {
 
         IntBooleanHashMap inMST = new IntBooleanHashMap();
         IntIntHashMap key = new IntIntHashMap();
+
         verticesMap.forEachKey(idx -> {
             inMST.put(idx, false);
             key.put(idx, Integer.MAX_VALUE);
@@ -97,10 +99,26 @@ public class Graph<VD, ED> {
     }
 
     List<Edge<ED>> kruskalMST() {
+        if (isDirected)
+            throw new UnsupportedOperationException();
+
         List<Edge<ED>> mst = FastList.newList();
+        DisjointSet disjointSet = new DisjointSet();
+        adjacencyList.keysView().forEach(disjointSet::makeSet);
 
+        // using to sorted list instead of sort this
+        // to avoid abusing ths in place property of fast list
+        // each subsequent sort would be O(|E|) instead of O(|E|lg|E|)
+        var sortedEdges = edgeList.toSortedList(Comparator.comparingInt(Edge<ED>::getWeight));
+        sortedEdges.forEach(edge -> {
+            int u = edge.u;
+            int v = edge.v;
+            if (disjointSet.findSet(u) != disjointSet.findSet(v)) {
+                mst.add(edge);
+                disjointSet.union(u, v);
+            }
+        });
 
-
-        return mst ;
+        return mst;
     }
 }
