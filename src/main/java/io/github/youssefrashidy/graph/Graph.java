@@ -16,11 +16,15 @@ public class Graph<VD, ED> {
     private int vertexCounter = 0;
     private int edgeCounter = 0;
 
-    private boolean isDirected = false;
+    private final GraphType type;
 
     IntObjectHashMap<Vertex<VD>> verticesMap = IntObjectHashMap.newMap();
     IntObjectHashMap<MutableList<Edge<ED>>> adjacencyList = IntObjectHashMap.newMap();
     MutableList<Edge<ED>> edgeList = FastList.newList();
+
+    public Graph(GraphType type) {
+        this.type = type;
+    }
 
     Vertex<VD> addVertex(VD data) {
         var vertex = new Vertex<>(vertexCounter++, data);
@@ -34,6 +38,8 @@ public class Graph<VD, ED> {
 
     // adds edge between existing nodes
     public void addEdge(Vertex<VD> u, Vertex<VD> v, ED data, int weight) {
+        if (type == GraphType.DIRECTED)
+            throw new RuntimeException();
         int edgeId = edgeCounter++;
         // undirected edges are decomposed into two edges one for each vertex with
         Edge<ED> edge = new Edge<>(u.id, v.id, edgeId, weight, data);
@@ -45,11 +51,13 @@ public class Graph<VD, ED> {
     }
 
     public void addDirectedEdge(Vertex<VD> u, Vertex<VD> v, ED data, int weight) {
+        if (type == GraphType.UNDIRECTED)
+            throw new RuntimeException();
+
         int edgeId = edgeCounter++;
         Edge<ED> edge = new Edge<>(u.id, v.id, edgeId, weight, data);
         adjacencyList.getIfAbsent(u.id, FastList::newList).add(edge);
         edgeList.add(edge);
-        isDirected = true;
     }
 
     private record QueueEntry<ED>(int vertexId, int key, Edge<ED> parentEdge) {
@@ -57,7 +65,7 @@ public class Graph<VD, ED> {
     }
 
     List<Edge<ED>> primMST() {
-        if (isDirected)
+        if (type != GraphType.UNDIRECTED)
             throw new UnsupportedOperationException("Prim's MST is not supported for directed graphs.");
         List<Edge<ED>> mst = FastList.newList();
 
@@ -104,7 +112,7 @@ public class Graph<VD, ED> {
     }
 
     List<Edge<ED>> kruskalMST() {
-        if (isDirected)
+        if (type != GraphType.UNDIRECTED)
             throw new UnsupportedOperationException("Kruskal's MST is not supported for directed graphs.");
 
         List<Edge<ED>> mst = FastList.newList();
@@ -164,6 +172,9 @@ public class Graph<VD, ED> {
     }
 
     IntIntHashMap dagShortestPath(Vertex<VD> source) {
+        if (type != GraphType.DIRECTED)
+            throw new RuntimeException();
+
         IntIntHashMap distances = new IntIntHashMap();
         MutableIntStack stack = topologicalSort();
 
