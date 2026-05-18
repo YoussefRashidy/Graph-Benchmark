@@ -1,5 +1,6 @@
 package io.github.youssefrashidy.benchmark.graphGenerator;
 
+import io.github.youssefrashidy.annotations.Component;
 import io.github.youssefrashidy.graph.Graph;
 import io.github.youssefrashidy.graph.GraphType;
 import io.github.youssefrashidy.graph.Vertex;
@@ -9,6 +10,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import java.util.Arrays;
 import java.util.Random;
 
+@Component
 public class GraphBuilder {
     Random rng = new Random(1234);
     int baseWeight = 1;

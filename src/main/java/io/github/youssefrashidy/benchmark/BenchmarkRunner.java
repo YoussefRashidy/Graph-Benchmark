@@ -5,7 +5,6 @@ import io.github.youssefrashidy.benchmark.model.Algorithm;
 import io.github.youssefrashidy.benchmark.model.Distribution;
 import io.github.youssefrashidy.benchmark.model.SingleRun;
 import io.github.youssefrashidy.graph.Graph;
-import io.github.youssefrashidy.graph.GraphType;
 import io.github.youssefrashidy.graph.Vertex;
 import io.github.youssefrashidy.graph.exceptions.SingleRunMismatchException;
 
@@ -14,31 +13,31 @@ public class BenchmarkRunner {
     private static final int WARM_UP = 5;
     private static final int ITERATIONS = 20;
 
-    SingleRun runSingleRun(Algorithm algorithm, Graph<Void, Void> graph, Distribution distribution) {
+    SingleRun runSingleRun(Algorithm algorithm, Graph<Void, Void> graph, Distribution distribution , int v) {
         return switch (algorithm) {
             case PRIM -> {
                 // warm up
                 warmUp(algorithm, graph);
-                yield new SingleRun(algorithm, distribution, runPrim(graph));
+                yield new SingleRun(algorithm, distribution, runPrim(graph) , v);
             }
             case KRUSKAL -> {
                 warmUp(algorithm, graph);
-                yield new SingleRun(algorithm, distribution, runKruskal(graph));
+                yield new SingleRun(algorithm, distribution, runKruskal(graph) , v);
             }
             default -> throw new SingleRunMismatchException("Algorithm " + algorithm + " requires a source vertex.");
         };
     }
 
-    SingleRun runSingleRun(Algorithm algorithm, Graph<Void, Void> graph, Distribution distribution, Vertex<Void> source) {
+    SingleRun runSingleRun(Algorithm algorithm, Graph<Void, Void> graph, Distribution distribution, Vertex<Void> source,int v) {
         return switch (algorithm) {
             case DIJKSTRA -> {
                 // warm up
                 warmUp(algorithm, graph, source);
-                yield new SingleRun(algorithm, distribution, runDijkstra(graph, source));
+                yield new SingleRun(algorithm, distribution, runDijkstra(graph, source),v);
             }
             case DAG_SP -> {
                 warmUp(algorithm, graph, source);
-                yield new SingleRun(algorithm, distribution, runDAG(graph, source));
+                yield new SingleRun(algorithm, distribution, runDAG(graph, source),v);
             }
             default -> throw new SingleRunMismatchException("Algorithm " + algorithm + " does not require a source vertex.");
         };

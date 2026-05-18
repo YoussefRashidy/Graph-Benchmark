@@ -1,6 +1,8 @@
 package io.github.youssefrashidy.graph;
 
 import io.github.youssefrashidy.graph.augumentingDS.DisjointSet;
+import io.github.youssefrashidy.graph.exceptions.CycleDetectionException;
+import io.github.youssefrashidy.graph.exceptions.EdgeMismatchException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.stack.primitive.MutableIntStack;
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -26,22 +28,22 @@ public class Graph<VD, ED> {
         this.type = type;
     }
 
-    Vertex<VD> addVertex(VD data) {
+    public Vertex<VD> addVertex(VD data) {
         var vertex = new Vertex<>(vertexCounter++, data);
         verticesMap.put(vertex.id, vertex);
         return vertex;
     }
 
-    Vertex<VD> getVertex(int id) {
+    public Vertex<VD> getVertex(int id) {
         return verticesMap.get(id);
     }
 
     // adds edge between existing nodes
     public void addEdge(Vertex<VD> u, Vertex<VD> v, ED data, int weight) {
         if (type == GraphType.DIRECTED)
-            throw new RuntimeException();
+            throw new EdgeMismatchException("Cannot add undirected edge to a directed graph.");
         int edgeId = edgeCounter++;
-        // undirected edges are decomposed into two edges one for each vertex with
+        // undirected edges are decomposed into two edges one for each vertex with the same id
         Edge<ED> edge = new Edge<>(u.id, v.id, edgeId, weight, data);
         Edge<ED> edge2 = new Edge<>(v.id, u.id, edgeId, weight, data);
         adjacencyList.getIfAbsent(u.id, FastList::newList).add(edge);
@@ -52,7 +54,7 @@ public class Graph<VD, ED> {
 
     public void addDirectedEdge(Vertex<VD> u, Vertex<VD> v, ED data, int weight) {
         if (type == GraphType.UNDIRECTED)
-            throw new RuntimeException();
+            throw new EdgeMismatchException("Cannot add directed edge to an undirected graph.");
 
         int edgeId = edgeCounter++;
         Edge<ED> edge = new Edge<>(u.id, v.id, edgeId, weight, data);
@@ -64,7 +66,7 @@ public class Graph<VD, ED> {
 
     }
 
-    List<Edge<ED>> primMST() {
+    public List<Edge<ED>> primMST() {
         if (type != GraphType.UNDIRECTED)
             throw new UnsupportedOperationException("Prim's MST is not supported for directed graphs.");
         List<Edge<ED>> mst = FastList.newList();
@@ -93,7 +95,7 @@ public class Graph<VD, ED> {
                 continue;
             inMST.put(u, true);
             // what a beautiful stream (but what about performance dude)
-            // don't worry eclipse DS are optimized
+            // don't worry eclipse DS are optimized it operates on internal primitive Array
             // technically it is iterable but whatever it is a stream
             adjacencyList.get(minVertex.vertexId).forEach(edge -> {
                 int destination = edge.v;
@@ -111,7 +113,7 @@ public class Graph<VD, ED> {
         return mst;
     }
 
-    List<Edge<ED>> kruskalMST() {
+    public List<Edge<ED>> kruskalMST() {
         if (type != GraphType.UNDIRECTED)
             throw new UnsupportedOperationException("Kruskal's MST is not supported for directed graphs.");
 
@@ -120,7 +122,7 @@ public class Graph<VD, ED> {
         adjacencyList.keysView().forEach(disjointSet::makeSet);
 
         // using to sorted list instead of sort this
-        // to avoid abusing ths in place property of fast list
+        // to avoid abusing the in place property of fast list
         // each subsequent sort would be O(|E|) instead of O(|E|lg|E|)
         var sortedEdges = edgeList.toSortedList(Comparator.comparingInt(Edge<ED>::getWeight));
         sortedEdges.forEach(edge -> {
@@ -135,7 +137,7 @@ public class Graph<VD, ED> {
         return mst;
     }
 
-    IntIntHashMap dijkstra(Vertex<VD> source) {
+    public IntIntHashMap dijkstra(Vertex<VD> source) {
 
         IntBooleanHashMap foundShortestPath = new IntBooleanHashMap();
         IntIntHashMap distanceMap = new IntIntHashMap();
@@ -171,9 +173,9 @@ public class Graph<VD, ED> {
         return distanceMap;
     }
 
-    IntIntHashMap dagShortestPath(Vertex<VD> source) {
+    public IntIntHashMap dagShortestPath(Vertex<VD> source) {
         if (type != GraphType.DIRECTED)
-            throw new RuntimeException();
+            throw new RuntimeException("DAG shortest path requires a directed graph.");
 
         IntIntHashMap distances = new IntIntHashMap();
         MutableIntStack stack = topologicalSort();
@@ -197,10 +199,10 @@ public class Graph<VD, ED> {
         return distances;
     }
 
-    MutableIntStack topologicalSort() {
+    public MutableIntStack topologicalSort() {
         MutableIntStack stack = new IntArrayStack();
         IntHashSet visited = new IntHashSet();
-        IntHashSet onStack = new IntHashSet();
+        IntHashSet onStack = new IntHashSet(); // plays the role of gray color
         adjacencyList.keysView().forEach(vertex -> {
             if (visited.contains(vertex))
                 return;
@@ -212,36 +214,18 @@ public class Graph<VD, ED> {
     private void dfs(int vertex, MutableIntStack stack, IntHashSet visited, IntHashSet onStack) {
         visited.add(vertex);
         onStack.add(vertex);
+
         adjacencyList.get(vertex).forEach(edge -> {
             int v = edge.v;
             if (visited.contains(v))
                 return;
             if (onStack.contains(v))
-                throw new CycleDetectedException();
+                throw new CycleDetectionException("Cycle detected in the graph during topological sort.");
             dfs(v, stack, visited, onStack);
         });
+
         onStack.remove(vertex);
         stack.push(vertex);
     }
 
-    private static class CycleDetectedException extends RuntimeException {
-        public CycleDetectedException() {
-        }
-
-        public CycleDetectedException(String message) {
-            super(message);
-        }
-
-        public CycleDetectedException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public CycleDetectedException(Throwable cause) {
-            super(cause);
-        }
-
-        public CycleDetectedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-            super(message, cause, enableSuppression, writableStackTrace);
-        }
-    }
 }

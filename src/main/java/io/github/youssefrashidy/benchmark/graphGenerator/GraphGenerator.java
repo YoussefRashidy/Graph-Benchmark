@@ -1,18 +1,23 @@
 package io.github.youssefrashidy.benchmark.graphGenerator;
 
+import io.github.youssefrashidy.annotations.Component;
+import io.github.youssefrashidy.annotations.Inject;
 import io.github.youssefrashidy.graph.Graph;
-import io.github.youssefrashidy.graph.GraphType;
-import io.github.youssefrashidy.graph.Vertex;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+@Component
 public class GraphGenerator {
     Random rng = new Random(1234);
-    GraphBuilder graphBuilder ;
+    GraphBuilder graphBuilder;
+
+    @Inject
+    public GraphGenerator(GraphBuilder graphBuilder) {
+        this.graphBuilder = graphBuilder;
+    }
 
     public Graph<Void, Void> generateSparseGraph(int v, int maxWeight) {
         // create an array of size v shuffle it
@@ -79,7 +84,12 @@ public class GraphGenerator {
         while (edgeCount < extraEdges) {
             int i = rng.nextInt(v);
             int j = rng.nextInt(v);
-            if (j < i) continue;
+            if (j == i) continue;
+            if (j > i) {
+                int temp = i;
+                i = j;
+                j = temp;
+            }
             edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[j]);
             edgeCount++;
         }
