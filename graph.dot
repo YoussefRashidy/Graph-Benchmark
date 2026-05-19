@@ -1,0 +1,8 @@
+            graph g {
+                "A" -- "B" [label="5", color="red", penwidth=3];
+"C" -- "D" [label="3", color="red", penwidth=3];
+"C" -- "A" [label="4", color="gray", penwidth=1];
+"F" -- "B" [label="10", color="gray", penwidth=1];
+"Z" -- "G" [label="11", color="red", penwidth=3];
+"Z" -- "A" [label="9", color="gray", penwidth=1];
+            }

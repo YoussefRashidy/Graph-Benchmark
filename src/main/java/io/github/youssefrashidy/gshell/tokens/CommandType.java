@@ -1,0 +1,18 @@
+package io.github.youssefrashidy.gshell.tokens;
+
+public enum CommandType {
+    ADD_VERTEX,
+    ADD_VERTICES,
+    ADD_ALL_VERTICES,
+    ADD_EDGE,
+    ADD_EDGES,
+    PRIM_MST,
+    KRUSKAL_MST,
+    DIJKSTRA,
+    DAG_SHORTEST_PATH,
+    VISUALIZE_GRAPH,
+    VISUALIZE_PRIM_MST,
+    VISUALIZE_KRUSKAL_MST,
+    VISUALIZE_DIJKSTRA,
+    VISUALIZE_DAG_SHORTEST_PATH
+}
