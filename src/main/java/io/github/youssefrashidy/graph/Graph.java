@@ -66,6 +66,14 @@ public class Graph<VD, ED> {
         return edgeList.size();
     }
 
+    public List<Edge<ED>> getEdges() {
+        return edgeList.clone() ;
+    }
+
+    public GraphType getGraphType() {
+        return this.type;
+    }
+
 
     private record QueueEntry<ED>(int vertexId, int key, Edge<ED> parentEdge) {
 
@@ -194,7 +202,7 @@ public class Graph<VD, ED> {
             if (distances.get(u) == Integer.MAX_VALUE)
                 continue;
 
-            adjacencyList.get(u).forEach(edge -> {
+            adjacencyList.getIfAbsentPut(u, FastList::newList).forEach(edge -> {
                 int v = edge.v;
                 int weight = edge.weight;
                 // oops, overflow now no overflow

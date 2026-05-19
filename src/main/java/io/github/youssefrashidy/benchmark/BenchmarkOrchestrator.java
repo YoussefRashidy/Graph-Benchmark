@@ -24,23 +24,26 @@ public class BenchmarkOrchestrator {
         this.generator = generator;
     }
 
-    public BenchmarkResult runAll() {
+    public BenchmarkResult runAll() throws InterruptedException {
         System.out.println("Running MST benchmarks...");
         List<MSTComparison> mst = compareMST();
         System.gc();
+        Thread.sleep(50);
 
         System.out.println("Running SSSP general benchmarks...");
         List<SSSPGeneral> sssp = runSSSPGeneral();
         System.gc();
+        Thread.sleep(50);
 
         System.out.println("Running SSSP DAG comparison...");
         List<SSSPComparison> dag = compareSSSP();
         System.gc();
+        Thread.sleep(50);
 
         return new BenchmarkResult(mst, sssp, dag);
     }
 
-    public List<MSTComparison> compareMST() {
+    public List<MSTComparison> compareMST() throws InterruptedException {
         List<MSTComparison> list = FastList.newList();
         for (int size : SIZES) {
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -52,6 +55,7 @@ public class BenchmarkOrchestrator {
                         )
                 );
                 System.gc();
+                Thread.sleep(50);
             }
 
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -63,6 +67,7 @@ public class BenchmarkOrchestrator {
                         )
                 );
                 System.gc();
+                Thread.sleep(50);
             }
 
             if (size <= COMPLETE_MAX_V) {
@@ -75,13 +80,14 @@ public class BenchmarkOrchestrator {
                             )
                     );
                     System.gc();
+                    Thread.sleep(50);
                 }
             }
         }
         return list;
     }
 
-    List<SSSPGeneral> runSSSPGeneral() {
+    List<SSSPGeneral> runSSSPGeneral() throws InterruptedException {
         List<SSSPGeneral> list = FastList.newList();
         for (int size : SIZES) {
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -94,6 +100,7 @@ public class BenchmarkOrchestrator {
                         )
                 );
                 System.gc();
+                Thread.sleep(50);
             }
 
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -105,6 +112,7 @@ public class BenchmarkOrchestrator {
                         )
                 );
                 System.gc();
+                Thread.sleep(50);
             }
 
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -117,6 +125,7 @@ public class BenchmarkOrchestrator {
                         )
                 );
                 System.gc();
+                Thread.sleep(50);
             }
 
             if (size <= COMPLETE_MAX_V) {
@@ -130,13 +139,14 @@ public class BenchmarkOrchestrator {
                             )
                     );
                     System.gc();
+                    Thread.sleep(50);
                 }
             }
         }
         return list;
     }
 
-    List<SSSPComparison> compareSSSP() {
+    List<SSSPComparison> compareSSSP() throws InterruptedException {
         List<SSSPComparison> list = FastList.newList();
         for (int size : SIZES) {
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -149,6 +159,7 @@ public class BenchmarkOrchestrator {
                         )
                 );
                 System.gc();
+                Thread.sleep(50);
             }
         }
         return list;
