@@ -26,14 +26,14 @@ public class GraphGenerator {
         shuffle(vertices);
         for (int i = 1; i < v; i++) {
             int j = rng.nextInt(0, i);
-            edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[j]);
+            edges.getIfAbsentPut(vertices[i], FastList::newList).add(vertices[j]);
         }
         long extraEdges = 5L * v - (v - 1);
         long edgeCount = 0;
         while (edgeCount < extraEdges) {
             int i = rng.nextInt(v);
             int j = rng.nextInt(v);
-            edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[j]);
+            edges.getIfAbsentPut(vertices[i], FastList::newList).add(vertices[j]);
             edgeCount++;
         }
         // build graph object
@@ -46,15 +46,15 @@ public class GraphGenerator {
         IntObjectHashMap<FastList<Integer>> edges = new IntObjectHashMap<>();
         shuffle(vertices);
         for (int i = 1; i < v; i++) {
-            int j = rng.nextInt(0, i - 1);
-            edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[j]);
+            int j = rng.nextInt(0, i);
+            edges.getIfAbsentPut(vertices[i], FastList::newList).add(vertices[j]);
         }
-        long extraEdges = (long) (0.25 * ((long) v * (v - 1) / 2)) - (v - 1);
+        long extraEdges = (long) ((long) v * (v - 1) / 8) - (v - 1);
         long edgeCount = 0;
         while (edgeCount < extraEdges) {
             int i = rng.nextInt(v);
             int j = rng.nextInt(v);
-            edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[j]);
+            edges.getIfAbsentPut(vertices[i], FastList::newList).add(vertices[j]);
             edgeCount++;
         }
         // build graph object
@@ -66,7 +66,7 @@ public class GraphGenerator {
         IntObjectHashMap<FastList<Integer>> edges = new IntObjectHashMap<>();
         for (int i = 0; i < v; i++) {
             for (int j = i + 1; j < v; j++) {
-                edges.getIfAbsent(i, FastList::newList).add(j);
+                edges.getIfAbsentPut(i, FastList::newList).add(j);
             }
         }
         return graphBuilder.buildUndirectedGraphObject(vertices, edges, maxWeight);
@@ -77,7 +77,7 @@ public class GraphGenerator {
         IntObjectHashMap<FastList<Integer>> edges = new IntObjectHashMap<>();
         shuffle(vertices);
         for (int i = 0; i < v - 1; i++) {
-            edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[i + 1]);
+            edges.getIfAbsentPut(vertices[i], FastList::newList).add(vertices[i + 1]);
         }
         long extraEdges = 5L * v - (v - 1);
         long edgeCount = 0;
@@ -85,12 +85,12 @@ public class GraphGenerator {
             int i = rng.nextInt(v);
             int j = rng.nextInt(v);
             if (j == i) continue;
-            if (j > i) {
+            if (j < i) {
                 int temp = i;
                 i = j;
                 j = temp;
             }
-            edges.getIfAbsent(vertices[i], FastList::newList).add(vertices[j]);
+            edges.getIfAbsentPut(vertices[i], FastList::newList).add(vertices[j]);
             edgeCount++;
         }
 
@@ -105,6 +105,5 @@ public class GraphGenerator {
             array[i] = temp;
         }
     }
-
 
 }

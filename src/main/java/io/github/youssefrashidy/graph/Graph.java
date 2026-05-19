@@ -46,8 +46,8 @@ public class Graph<VD, ED> {
         // undirected edges are decomposed into two edges one for each vertex with the same id
         Edge<ED> edge = new Edge<>(u.id, v.id, edgeId, weight, data);
         Edge<ED> edge2 = new Edge<>(v.id, u.id, edgeId, weight, data);
-        adjacencyList.getIfAbsent(u.id, FastList::newList).add(edge);
-        adjacencyList.getIfAbsent(v.id, FastList::newList).add(edge2);
+        adjacencyList.getIfAbsentPut(u.id, FastList::newList).add(edge);
+        adjacencyList.getIfAbsentPut(v.id, FastList::newList).add(edge2);
         // edge list stores only unique edges
         edgeList.add(edge);
     }
@@ -58,9 +58,14 @@ public class Graph<VD, ED> {
 
         int edgeId = edgeCounter++;
         Edge<ED> edge = new Edge<>(u.id, v.id, edgeId, weight, data);
-        adjacencyList.getIfAbsent(u.id, FastList::newList).add(edge);
+        adjacencyList.getIfAbsentPut(u.id, FastList::newList).add(edge);
         edgeList.add(edge);
     }
+
+    public long getEdgeCount() {
+        return edgeList.size();
+    }
+
 
     private record QueueEntry<ED>(int vertexId, int key, Edge<ED> parentEdge) {
 
@@ -83,7 +88,6 @@ public class Graph<VD, ED> {
         PriorityQueue<QueueEntry<ED>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(QueueEntry::key));
 
         int source = verticesMap.keysView().min();
-        inMST.put(source, true);
         key.put(source, 0);
 
         priorityQueue.add(new QueueEntry<>(source, 0, null));
@@ -97,13 +101,15 @@ public class Graph<VD, ED> {
             // what a beautiful stream (but what about performance dude)
             // don't worry eclipse DS are optimized it operates on internal primitive Array
             // technically it is iterable but whatever it is a stream
-            adjacencyList.get(minVertex.vertexId).forEach(edge -> {
+            adjacencyList.getIfAbsentPut(minVertex.vertexId, FastList.newList()).forEach(edge -> {
                 int destination = edge.v;
                 int weight = edge.weight;
                 if (inMST.get(destination))
                     return;
                 if (key.get(destination) <= weight)
                     return;
+
+                key.put(destination, weight);
                 priorityQueue.offer(new QueueEntry<>(destination, weight, edge));
             });
 
@@ -119,7 +125,7 @@ public class Graph<VD, ED> {
 
         List<Edge<ED>> mst = FastList.newList();
         DisjointSet disjointSet = new DisjointSet();
-        adjacencyList.keysView().forEach(disjointSet::makeSet);
+        verticesMap.keysView().forEach(disjointSet::makeSet);
 
         // using to sorted list instead of sort this
         // to avoid abusing the in place property of fast list
@@ -159,7 +165,7 @@ public class Graph<VD, ED> {
             if (foundShortestPath.get(u))
                 continue;
             foundShortestPath.put(u, true);
-            adjacencyList.get(u).forEach(edge -> {
+            adjacencyList.getIfAbsentPut(u, FastList.newList()).forEach(edge -> {
                 int v = edge.v;
                 int weight = edge.weight;
                 if (distanceMap.get(v) <= weight + distanceMap.get(u) || foundShortestPath.get(v))
@@ -175,12 +181,12 @@ public class Graph<VD, ED> {
 
     public IntIntHashMap dagShortestPath(Vertex<VD> source) {
         if (type != GraphType.DIRECTED)
-            throw new RuntimeException("DAG shortest path requires a directed graph.");
+            throw new EdgeMismatchException("DAG shortest path requires a directed graph.");
 
         IntIntHashMap distances = new IntIntHashMap();
         MutableIntStack stack = topologicalSort();
 
-        adjacencyList.keysView().forEach(vertex -> distances.put(vertex, Integer.MAX_VALUE));
+        verticesMap.keysView().forEach(vertex -> distances.put(vertex, Integer.MAX_VALUE));
         distances.put(source.id, 0);
 
         while (!stack.isEmpty()) {
@@ -203,7 +209,7 @@ public class Graph<VD, ED> {
         MutableIntStack stack = new IntArrayStack();
         IntHashSet visited = new IntHashSet();
         IntHashSet onStack = new IntHashSet(); // plays the role of gray color
-        adjacencyList.keysView().forEach(vertex -> {
+        verticesMap.keysView().forEach(vertex -> {
             if (visited.contains(vertex))
                 return;
             dfs(vertex, stack, visited, onStack);
@@ -215,12 +221,12 @@ public class Graph<VD, ED> {
         visited.add(vertex);
         onStack.add(vertex);
 
-        adjacencyList.get(vertex).forEach(edge -> {
+        adjacencyList.getIfAbsentPut(vertex, FastList.newList()).forEach(edge -> {
             int v = edge.v;
-            if (visited.contains(v))
-                return;
             if (onStack.contains(v))
                 throw new CycleDetectionException("Cycle detected in the graph during topological sort.");
+            if (visited.contains(v))
+                return;
             dfs(v, stack, visited, onStack);
         });
 
