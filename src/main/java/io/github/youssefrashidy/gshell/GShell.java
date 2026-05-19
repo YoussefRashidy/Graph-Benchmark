@@ -50,12 +50,7 @@ public class GShell {
 
         }
     }
-
-    public static void main(String[] args) {
-        GShell shell = new GShell();
-        shell.shell();
-    }
-
+    
     private void printWelcome() {
 
     }

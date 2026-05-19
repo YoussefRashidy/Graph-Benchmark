@@ -67,7 +67,7 @@ public class Graph<VD, ED> {
     }
 
     public List<Edge<ED>> getEdges() {
-        return edgeList.clone() ;
+        return edgeList.clone();
     }
 
     public GraphType getGraphType() {
@@ -220,7 +220,7 @@ public class Graph<VD, ED> {
         verticesMap.keysView().forEach(vertex -> {
             if (visited.contains(vertex))
                 return;
-            dfs(vertex, stack, visited, onStack);
+            dfsIterative(vertex, stack, visited, onStack);
         });
         return stack;
     }
@@ -229,7 +229,7 @@ public class Graph<VD, ED> {
         visited.add(vertex);
         onStack.add(vertex);
 
-        adjacencyList.getIfAbsentPut(vertex, FastList.newList()).forEach(edge -> {
+        adjacencyList.getIfAbsentPut(vertex, FastList::newList).forEach(edge -> {
             int v = edge.v;
             if (onStack.contains(v))
                 throw new CycleDetectionException("Cycle detected in the graph during topological sort.");
@@ -240,6 +240,54 @@ public class Graph<VD, ED> {
 
         onStack.remove(vertex);
         stack.push(vertex);
+    }
+
+    private record DFSFrame(int vertex, boolean processed) {
+    }
+
+    private void dfsIterative(int start, MutableIntStack topoStack, IntHashSet visited, IntHashSet onStack) {
+
+        Deque<DFSFrame> dfsStack = new ArrayDeque<>();
+
+        dfsStack.push(new DFSFrame(start, false));
+
+        while (!dfsStack.isEmpty()) {
+
+            DFSFrame frame = dfsStack.pop();
+            int u = frame.vertex;
+
+            // second time we see the node
+            if (frame.processed) {
+                onStack.remove(u);
+                topoStack.push(u);
+                continue;
+            }
+
+            if (visited.contains(u))
+                continue;
+
+            visited.add(u);
+            onStack.add(u);
+
+            dfsStack.push(new DFSFrame(u, true));
+
+            MutableList<Edge<ED>> edges = adjacencyList.getIfAbsentPut(u, FastList::newList);
+
+            for (int i = edges.size() - 1; i >= 0; i--) {
+
+                Edge<ED> edge = edges.get(i);
+                int v = edge.v;
+
+                if (onStack.contains(v))
+                    throw new CycleDetectionException(
+                            "Cycle detected in the graph during topological sort."
+                    );
+
+                if (!visited.contains(v)) {
+                    dfsStack.push(new DFSFrame(v, false));
+                }
+            }
+        }
     }
 
 }

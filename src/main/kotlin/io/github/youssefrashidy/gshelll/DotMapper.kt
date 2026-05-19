@@ -3,8 +3,8 @@ package io.github.youssefrashidy.gshelll
 import io.github.youssefrashidy.graph.Edge
 import io.github.youssefrashidy.graph.Graph
 import io.github.youssefrashidy.graph.GraphType
-import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap
 
+// Kotlin taste
 class DotMapper {
     val edgeColor = "gray"
     val mstEdgeColor = "red";

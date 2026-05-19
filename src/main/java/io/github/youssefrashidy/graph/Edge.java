@@ -1,9 +1,11 @@
 package io.github.youssefrashidy.graph;
 
-public class Edge <D> {
-    protected final int u , v , id ;
-    protected int weight ;
-    protected D data ;
+import java.util.Objects;
+
+public class Edge<D> {
+    protected final int u, v, id;
+    protected int weight;
+    protected D data;
 
     public Edge(int u, int v, int id, int weight, D data) {
         this.u = u;
@@ -47,4 +49,16 @@ public class Edge <D> {
     public int getId() {
         return id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Edge<?> edge)) return false;
+        return id == edge.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
 }

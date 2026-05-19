@@ -8,13 +8,19 @@ import io.github.youssefrashidy.context.ApplicationContext;
 import io.github.youssefrashidy.gshell.GShell;
 import java.nio.file.Path;
 import java.util.Scanner;
+import java.util.Set;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Scanner scanner = new Scanner(System.in);
-        ApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
+        ApplicationContext context = new AnnotationConfigApplicationContext(
+                Set.of(
+                        "io.github.youssefrashidy.benchmark",
+                        "io.github.youssefrashidy.graph",
+                        "io.github.youssefrashidy.gshell"
+                )
+        );
         while (true) {
             System.out.println("Choose one of the following options");
             System.out.println("1.Graph Shell");
