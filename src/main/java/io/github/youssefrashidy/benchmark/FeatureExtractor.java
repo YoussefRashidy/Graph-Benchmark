@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class FeatureExtractor {
 
-    List<RunStats> extractMSTFeature(List<MSTComparison> list) {
+    public List<RunStats> extractMSTFeature(List<MSTComparison> list) {
         List<RunStats> runStatsList = FastList.newList();
         list.forEach(mstComparison -> {
             var prim = mstComparison.prim();
@@ -26,7 +26,7 @@ public class FeatureExtractor {
         return runStatsList;
     }
 
-    List<RunStats> extractSSSPGeneralFeature(List<SSSPGeneral> list) {
+    public List<RunStats> extractSSSPGeneralFeature(List<SSSPGeneral> list) {
         List<RunStats> runStatsList = FastList.newList();
         list.forEach(ssspGeneral -> {
             var dijkstra = ssspGeneral.dijkstra();
@@ -45,7 +45,7 @@ public class FeatureExtractor {
         return runStatsList;
     }
 
-    List<RunStats> extractSSSPDAGFeature(List<SSSPComparison> list) {
+    public List<RunStats> extractSSSPDAGFeature(List<SSSPComparison> list) {
         List<RunStats> runStatsList = FastList.newList();
         list.forEach(ssspComparison -> {
             var dijkstra = ssspComparison.dijkstra();

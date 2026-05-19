@@ -87,7 +87,7 @@ public class BenchmarkOrchestrator {
         return list;
     }
 
-    List<SSSPGeneral> runSSSPGeneral() throws InterruptedException {
+    public List<SSSPGeneral> runSSSPGeneral() throws InterruptedException {
         List<SSSPGeneral> list = FastList.newList();
         for (int size : SIZES) {
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
@@ -146,7 +146,7 @@ public class BenchmarkOrchestrator {
         return list;
     }
 
-    List<SSSPComparison> compareSSSP() throws InterruptedException {
+    public List<SSSPComparison> compareSSSP() throws InterruptedException {
         List<SSSPComparison> list = FastList.newList();
         for (int size : SIZES) {
             for (int i = 0; i < GRAPHS_PER_SIZE; i++) {
