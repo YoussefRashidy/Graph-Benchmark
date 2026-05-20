@@ -7,8 +7,8 @@ import io.github.youssefrashidy.graph.GraphType
 // Kotlin taste
 class DotMapper {
     val edgeColor = "gray"
-    val mstEdgeColor = "red";
-    val mstPenWidth = 3;
+    val mstEdgeColor = "green";
+    val mstPenWidth = 4;
     val penWidth = 1
     fun <VD, ED> toDot(graph: Graph<VD, ED>, identifier: String): String {
         val graphType = if (graph.graphType == GraphType.UNDIRECTED) "graph" else "digraph";
@@ -17,7 +17,7 @@ class DotMapper {
         return """
             $graphType $identifier  {
                 graph [layout=sfdp K=2.0 nodesep=2.0 overlap=prism splines=true size="20,20!" dpi=150]
-                node  [shape=circle width=0.8]
+                node  [shape=circle width=0.9 fixedsize=true style=filled fillcolor="#1E88E5" color="#0D47A1" fontcolor="white" fontname="Helvetica" fontsize=13]
                 $dotBody
             }
         """.trimIndent()
