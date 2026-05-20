@@ -12,7 +12,7 @@ import java.util.List;
 public class BenchmarkOrchestrator {
     BenchmarkRunner runner;
     GraphGenerator generator;
-    private static final int[] SIZES = {1000, 2500, 5000, 10000};
+    private static final int[] SIZES = {1000, 2500, 5000, 10000,50000,100000};
     private static final int GRAPHS_PER_SIZE = 10;
     private static final int MAX_WEIGHT = 1000;
     private static final int COMPLETE_MAX_V = 5000; // cap complete graph 50M Edge is too much

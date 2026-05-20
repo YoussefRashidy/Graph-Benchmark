@@ -124,19 +124,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>io.github.youssefrashidy.Main</mainClass>
-                    <jvmArgs>
-                        <jvmArg>-server</jvmArg>
-                        <jvmArg>-XX:+UseG1GC</jvmArg>
-                        <jvmArg>-XX:+AlwaysPreTouch</jvmArg>
-                        <jvmArg>-Xms4g</jvmArg>
-                        <jvmArg>-Xmx4g</jvmArg>
-
-                        <jvmArg>-XX:TieredCompilation</jvmArg>
-                        <jvmArg>-XX:Tier3InvocationThreshold=10</jvmArg>
-                        <jvmArg>-XX:Tier4InvocationThreshold=50</jvmArg>
-
-                        <jvmArg>-XX:+PrintCompilation</jvmArg>
-                    </jvmArgs>
                 </configuration>
             </plugin>
         </plugins>

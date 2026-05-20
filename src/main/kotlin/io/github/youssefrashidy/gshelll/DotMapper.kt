@@ -15,7 +15,9 @@ class DotMapper {
         val edgeSymbol = if (graph.graphType == GraphType.UNDIRECTED) "--" else "->";
         val dotBody = graph.edges.joinToString("\n") { edge -> renderEdge(graph, edge, edgeSymbol) }
         return """
-            $graphType $identifier {
+            $graphType $identifier  {
+                graph [layout=sfdp K=2.0 nodesep=2.0 overlap=prism splines=true size="20,20!" dpi=150]
+                node  [shape=circle width=0.8]
                 $dotBody
             }
         """.trimIndent()
@@ -30,6 +32,8 @@ class DotMapper {
         val dotBody = graph.edges.joinToString("\n") { edge -> renderMstEdge(graph, edge, edgeSymbol, edge in mstSet) }
         return """
             $graphType $identifier {
+            graph [layout=sfdp K=2.0 nodesep=2.0 overlap=prism splines=true size="20,20!" dpi=150]
+            node  [shape=circle width=0.8]
                 $dotBody
             }
         """.trimIndent()
