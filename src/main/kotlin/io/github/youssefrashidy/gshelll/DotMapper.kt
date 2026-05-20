@@ -33,7 +33,7 @@ class DotMapper {
         return """
             $graphType $identifier {
             graph [layout=sfdp K=2.0 nodesep=2.0 overlap=prism splines=true size="20,20!" dpi=150]
-            node  [shape=circle width=0.8]
+            node  [shape=circle width=0.9 fixedsize=true style=filled fillcolor="#1E88E5" color="#0D47A1" fontcolor="white" fontname="Helvetica" fontsize=13]
                 $dotBody
             }
         """.trimIndent()
