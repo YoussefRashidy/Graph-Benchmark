@@ -220,7 +220,7 @@ public class Graph<VD, ED> {
         verticesMap.keysView().forEach(vertex -> {
             if (visited.contains(vertex))
                 return;
-            dfs(vertex, stack, visited, onStack);
+            dfsIterative(vertex, stack, visited, onStack);
         });
         return stack;
     }

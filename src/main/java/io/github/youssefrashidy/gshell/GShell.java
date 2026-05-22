@@ -50,8 +50,25 @@ public class GShell {
 
         }
     }
-    
-    private void printWelcome() {
 
+    private void printWelcome() {
+        System.out.println("""
+            ██████╗ ███████╗██╗  ██╗███████╗██╗     ██╗
+            ██╔════╝██╔════╝██║  ██║██╔════╝██║     ██║
+            ██║  ███╗███████╗███████║█████╗  ██║     ██║
+            ██║   ██║╚════██║██╔══██║██╔══╝  ██║     ██║
+            ╚██████╔╝███████║██║  ██║███████╗███████╗███████╗
+             ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
+            """);
+        System.out.println("  Graph Shell  —  interactive graph algorithm environment");
+        System.out.println("  Type 'help' for available commands, 'exit' or 'quit' to leave.\n");
+        System.out.println("  Actually there is no help but you know how things are going");
+        System.out.println("  Supported commands:");
+        System.out.println("    new <id> = new Graph(Directed|Undirected)");
+        System.out.println("    <id>.addVertex(\"v\")          <id>.addEdge(\"u\",\"v\",w)");
+        System.out.println("    <id>.primMST()               <id>.kruskalMST()");
+        System.out.println("    <id>.dijkstra(\"src\")         <id>.dagShortestPath(\"src\")");
+        System.out.println("    <id>.visualizePrimMST()      <id>.visualizeKruskalMST()");
+        System.out.println("    <id>.visualizeGraph()\n");
     }
 }

@@ -10,15 +10,15 @@ import io.github.youssefrashidy.gshell.tokens.IdentifierToken;
 import io.github.youssefrashidy.gshell.tokens.NumberToken;
 import io.github.youssefrashidy.gshell.tokens.StringToken;
 import io.github.youssefrashidy.gshell.tokens.Token;
-import io.github.youssefrashidy.gshelll.DotMapper;
+import io.github.youssefrashidy.gshell.DotMapper;
 import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -56,9 +56,10 @@ public record CommandNode(IdentifierToken identifier, CommandToken command, List
             case VISUALIZE_GRAPH -> {
                 String dotString = new DotMapper().toDot(graph, identifier.name());
                 // create a process and instruct it to load the dot
-                File dotFile = new File("graph.dot");
+                String fileName = identifier.name() + "_graph"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) ;
+                File dotFile = new File(fileName+".dot");
                 Files.writeString(Path.of(dotFile.getAbsolutePath()), dotString);
-                Process process = new ProcessBuilder("dot", "-Tpng", dotFile.getAbsolutePath(), "-o", new File("graph.png").getAbsolutePath())
+                Process process = new ProcessBuilder("dot", "-Tpng", dotFile.getAbsolutePath(), "-o", new File(fileName+".png").getAbsolutePath())
                         .redirectErrorStream(true)
                         .start();
                 int exitCode = process.waitFor();
@@ -67,15 +68,17 @@ public record CommandNode(IdentifierToken identifier, CommandToken command, List
                     String error = new String(process.getInputStream().readAllBytes());
                     throw new RuntimeException("Graphviz failed:\n" + error);
                 }
-                new ProcessBuilder("cmd", "/c", "start", "graph.png").start();
+                new ProcessBuilder("cmd", "/c", "start", fileName+".png").start();
 
             }
             case VISUALIZE_PRIM_MST -> {
                 String dotString = new DotMapper().toDotMst(graph, identifier.name(), graph.primMST());
                 // create a process and instruct it to load the dot
-                File dotFile = new File("graph.dot");
+                String fileName = identifier.name() + "_prim"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) ;
+
+                File dotFile = new File(fileName+".dot");
                 Files.writeString(Path.of(dotFile.getAbsolutePath()), dotString);
-                Process process = new ProcessBuilder("dot", "-Tpng", dotFile.getAbsolutePath(), "-o", new File("graph.png").getAbsolutePath())
+                Process process = new ProcessBuilder("dot", "-Tpng", dotFile.getAbsolutePath(), "-o", new File(fileName+".png").getAbsolutePath())
                         .redirectErrorStream(true)
                         .start();
                 int exitCode = process.waitFor();
@@ -84,15 +87,16 @@ public record CommandNode(IdentifierToken identifier, CommandToken command, List
                     String error = new String(process.getInputStream().readAllBytes());
                     throw new RuntimeException("Graphviz failed:\n" + error);
                 }
-                new ProcessBuilder("cmd", "/c", "start", "graph.png").start();
+                new ProcessBuilder("cmd", "/c", "start", fileName+".png").start();
 
             }
             case VISUALIZE_KRUSKAL_MST -> {
                 String dotString = new DotMapper().toDotMst(graph, identifier.name(), graph.kruskalMST());
+                String fileName = identifier.name() + "_kruskal"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) ;
                 // create a process and instruct it to load the dot
-                File dotFile = new File("graph.dot");
+                File dotFile = new File(fileName+".dot");
                 Files.writeString(Path.of(dotFile.getAbsolutePath()), dotString);
-                Process process = new ProcessBuilder("dot", "-Tpng", dotFile.getAbsolutePath(), "-o", new File("graph.png").getAbsolutePath())
+                Process process = new ProcessBuilder("dot", "-Tpng", dotFile.getAbsolutePath(), "-o", new File(fileName+".png").getAbsolutePath())
                         .redirectErrorStream(true)
                         .start();
                 int exitCode = process.waitFor();
@@ -101,7 +105,7 @@ public record CommandNode(IdentifierToken identifier, CommandToken command, List
                     String error = new String(process.getInputStream().readAllBytes());
                     throw new RuntimeException("Graphviz failed:\n" + error);
                 }
-                new ProcessBuilder("cmd", "/c", "start", "graph.png").start();
+                new ProcessBuilder("cmd", "/c", "start", fileName+".png").start();
             }
 
             case VISUALIZE_DAG_SHORTEST_PATH, VISUALIZE_DIJKSTRA -> System.out.println("Coming soon");
