@@ -116,7 +116,7 @@ Visualization commands render the graph to a PNG file named `{identifier}_{algor
 
 **Plain graph (`visualizeGraph`)**
 
-![Plain graph visualization](graph.png)
+![Plain graph visualization](g_graph20260522_194030.png)
 
 **Prim's MST (`visualizePrimMST`)**
 
