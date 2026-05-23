@@ -106,7 +106,7 @@ gshell> Graph g = new Graph(Undirected)
 gshell> g.addVertices("A", "B", "C", "D")
 gshell> g.addEdges("A", "B", 4, "A", "C", 2, "B", "D", 5, "C", "D", 1)
 gshell> g.kruskalMST()
-[C-D(1), A-C(2), B-D(5)]
+[C-D(1), A-C(2), A-B(4)]
 gshell> g.visualizeKruskalMST()
 ```
 
